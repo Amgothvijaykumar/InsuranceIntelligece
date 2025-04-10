@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Policy } from "@shared/schema";
-import { ArrowLeft, CheckCircle, InfoIcon } from "lucide-react";
+import { ArrowLeft, CheckCircle, InfoIcon, Lightbulb, AlertTriangle } from "lucide-react";
 
 interface PredictionResult {
   customer: {
@@ -20,6 +20,8 @@ interface PredictionResult {
   prominenceScore: number;
   governmentPolicies: Policy[];
   privatePolicies: Policy[];
+  recommendationReasons?: Record<string, string>;
+  additionalCoverageSuggestions?: string[];
 }
 
 export default function PredictionResultPage() {
@@ -51,7 +53,14 @@ export default function PredictionResultPage() {
     return null;
   }
   
-  const { isProminent, prominenceScore, governmentPolicies, privatePolicies } = data;
+  const { 
+    isProminent, 
+    prominenceScore, 
+    governmentPolicies, 
+    privatePolicies,
+    recommendationReasons = {},
+    additionalCoverageSuggestions = []
+  } = data;
   
   const handleBackToForm = () => {
     navigate("/assessment");
@@ -195,6 +204,42 @@ export default function PredictionResultPage() {
                 ))}
               </div>
             </div>
+
+            {/* Personalized Recommendation Reasons */}
+            {Object.keys(recommendationReasons).length > 0 && (
+              <div className="mt-8 border border-primary-200 rounded-lg p-5 bg-primary-50">
+                <div className="flex items-center mb-3">
+                  <Lightbulb className="h-5 w-5 text-primary mr-2" />
+                  <h4 className="text-lg font-medium text-gray-900">Why We Recommend These Policies</h4>
+                </div>
+                <div className="space-y-3">
+                  {Object.entries(recommendationReasons).map(([category, reason], index) => (
+                    <div key={index} className="bg-white p-3 rounded-md border border-gray-100">
+                      <h5 className="text-sm font-medium text-gray-800 capitalize">{category} Insurance</h5>
+                      <p className="text-sm text-gray-600 mt-1">{reason}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Additional Coverage Suggestions */}
+            {additionalCoverageSuggestions.length > 0 && (
+              <div className="mt-6 border border-amber-200 rounded-lg p-5 bg-amber-50">
+                <div className="flex items-center mb-3">
+                  <AlertTriangle className="h-5 w-5 text-amber-500 mr-2" />
+                  <h4 className="text-lg font-medium text-gray-900">Consider Additional Coverage</h4>
+                </div>
+                <ul className="space-y-2">
+                  {additionalCoverageSuggestions.map((suggestion, index) => (
+                    <li key={index} className="flex items-start">
+                      <span className="text-amber-600 mr-2">•</span>
+                      <p className="text-sm text-gray-700">{suggestion}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="mt-8 flex justify-end space-x-4">
               <Button 
