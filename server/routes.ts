@@ -7,6 +7,11 @@ import {
   insertCustomerPolicySchema
 } from "@shared/schema";
 import { predictProminence } from "./models";
+import { 
+  generatePolicyRecommendations, 
+  generatePersonalizedRecommendationReasons,
+  suggestAdditionalCoverage
+} from "./recommendation-engine";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes
@@ -48,26 +53,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         prominenceScore
       });
 
-      // Get recommended policies based on prominence status
+      // Get all available policies
       const governmentPolicies = await storage.getGovernmentPolicies();
       const allPolicies = await storage.getPolicies();
       
-      // Filter policies based on customer's preferences
-      const preferredCategories = validatedData.policiesChosen.split(',');
-      
-      const filteredGovernmentPolicies = governmentPolicies.filter(policy => 
-        preferredCategories.includes(policy.category)
+      // Use the AI recommendation engine to get optimized policy recommendations
+      const { 
+        recommendedGovernmentPolicies, 
+        recommendedPrivatePolicies 
+      } = generatePolicyRecommendations(
+        validatedData, 
+        prominenceScore,
+        allPolicies
       );
       
-      const filteredPrivatePolicies = allPolicies.filter(policy => 
-        !policy.isGovernmentPolicy && preferredCategories.includes(policy.category)
+      // Get personalized recommendation reasons
+      const recommendationReasons = Object.fromEntries(
+        generatePersonalizedRecommendationReasons(validatedData, prominenceScore)
+      );
+      
+      // Get suggestions for additional coverage
+      const additionalCoverageSuggestions = suggestAdditionalCoverage(
+        validatedData, 
+        prominenceScore
       );
       
       // Associate policies with customer
       const customerPolicies = [];
       
       if (customer) {
-        for (const policy of [...filteredGovernmentPolicies, ...filteredPrivatePolicies]) {
+        // Clean up any existing recommendations for this customer
+        // In a real app, you might want to keep history instead of removing
+        const existingPolicies = await storage.getCustomerPoliciesByCustomerId(customer.id);
+        
+        // Store new recommendations
+        for (const policy of [...recommendedGovernmentPolicies, ...recommendedPrivatePolicies]) {
           const customerPolicy = await storage.createCustomerPolicy({
             customerId: customer.id,
             policyId: policy.id,
@@ -81,8 +101,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customer,
         isProminent,
         prominenceScore,
-        governmentPolicies: filteredGovernmentPolicies,
-        privatePolicies: filteredPrivatePolicies
+        governmentPolicies: recommendedGovernmentPolicies,
+        privatePolicies: recommendedPrivatePolicies,
+        recommendationReasons,
+        additionalCoverageSuggestions
       });
     } catch (error) {
       console.error("Assessment error:", error);
