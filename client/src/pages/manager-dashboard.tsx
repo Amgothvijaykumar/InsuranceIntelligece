@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bell, ChevronDown, Download, LogOut, User } from "lucide-react";
+import { Bell, ChevronDown, Download, LogOut, User, Search, Filter, Shield } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, ResponsiveContainer } from "recharts";
 import StatsCard from "@/components/dashboard/stats-card";
 import CustomerList from "@/components/dashboard/customer-list";
-import { Shield } from "lucide-react";
+import { Link } from "wouter";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 interface DashboardStats {
   totalCustomers: number;
@@ -50,6 +52,8 @@ const modelPerformanceData = [
 
 export default function ManagerDashboard() {
   const { user, logoutMutation } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all"); // "all", "prominent", "standard"
   
   const { data: stats, isLoading: isStatsLoading } = useQuery<DashboardStats>({
     queryKey: ["/api/manager/dashboard-stats"],
@@ -251,8 +255,47 @@ export default function ManagerDashboard() {
             {/* Prominent Customers List */}
             <div className="bg-white rounded-lg shadow">
               <div className="px-5 py-6 sm:px-6">
-                <h2 className="text-lg font-medium text-gray-900">Recent Prominent Customers</h2>
-                <p className="mt-1 text-sm text-gray-500">Latest customers identified as prominent by AI</p>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-lg font-medium text-gray-900">Customer Management</h2>
+                    <p className="mt-1 text-sm text-gray-500">Search, filter and manage your customers</p>
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                  <div className="relative flex-grow">
+                    <Input
+                      placeholder="Search customers..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant={filterType === "all" ? "default" : "outline"} 
+                      size="sm"
+                      onClick={() => setFilterType("all")}
+                    >
+                      All
+                    </Button>
+                    <Button 
+                      variant={filterType === "prominent" ? "default" : "outline"} 
+                      size="sm"
+                      onClick={() => setFilterType("prominent")}
+                      className={filterType === "prominent" ? "bg-green-600 hover:bg-green-700" : ""}
+                    >
+                      Prominent
+                    </Button>
+                    <Button 
+                      variant={filterType === "standard" ? "default" : "outline"} 
+                      size="sm"
+                      onClick={() => setFilterType("standard")}
+                    >
+                      Standard
+                    </Button>
+                  </div>
+                </div>
               </div>
               <div className="border-t border-gray-200">
                 {isCustomersLoading ? (
@@ -260,14 +303,54 @@ export default function ManagerDashboard() {
                     <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
                   </div>
                 ) : (
-                  <CustomerList customers={customers || []} />
+                  <CustomerList 
+                    customers={(customers || [])
+                      // Apply filters
+                      .filter(customer => {
+                        // Filter by prominence status
+                        if (filterType === "prominent" && !customer.isProminent) return false;
+                        if (filterType === "standard" && customer.isProminent) return false;
+                        
+                        // Search by available fields
+                        if (searchTerm) {
+                          const searchLower = searchTerm.toLowerCase();
+                          return (
+                            (customer.gender?.toLowerCase().includes(searchLower)) ||
+                            (customer.qualification?.toLowerCase().includes(searchLower)) ||
+                            (customer.income?.toLowerCase().includes(searchLower)) ||
+                            (customer.policiesChosen?.toLowerCase().includes(searchLower))
+                          );
+                        }
+                        
+                        return true;
+                      })
+                    } 
+                  />
                 )}
-                <div className="bg-gray-50 px-5 py-3">
-                  <div className="text-sm">
-                    <a href="#" className="font-medium text-primary hover:text-primary-dark">
-                      View all customers <span aria-hidden="true">&rarr;</span>
-                    </a>
+                <div className="bg-gray-50 px-5 py-3 flex justify-between items-center">
+                  <div className="text-sm text-gray-600">
+                    {!isCustomersLoading && `Showing ${(customers || [])
+                      .filter(customer => {
+                        if (filterType === "prominent" && !customer.isProminent) return false;
+                        if (filterType === "standard" && customer.isProminent) return false;
+                        
+                        if (searchTerm) {
+                          const searchLower = searchTerm.toLowerCase();
+                          return (
+                            (customer.gender?.toLowerCase().includes(searchLower)) ||
+                            (customer.qualification?.toLowerCase().includes(searchLower)) ||
+                            (customer.income?.toLowerCase().includes(searchLower)) ||
+                            (customer.policiesChosen?.toLowerCase().includes(searchLower))
+                          );
+                        }
+                        
+                        return true;
+                      }).length} customers`}
                   </div>
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 mr-2" />
+                    More Filters
+                  </Button>
                 </div>
               </div>
             </div>
