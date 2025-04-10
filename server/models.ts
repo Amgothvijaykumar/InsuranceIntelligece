@@ -3,6 +3,13 @@ import * as tf from "@tensorflow/tfjs-node";
 import path from "path";
 import fs from "fs";
 
+const MODEL_DIR = path.join(__dirname, "models");
+// Load the saved model artifacts
+const prominenceModel = path.join(MODEL_DIR, "prominence_model.h5");
+const scalerPath = path.join(MODEL_DIR, "scaler.save");
+const leIncomePath = path.join(MODEL_DIR, "le_income.save");
+const leNumPoliciesPath = path.join(MODEL_DIR, "le_num_policies.save");
+
 // Placeholder function for TensorFlow.js model loading and prediction
 // In a real app, this would load the trained model from a file
 
