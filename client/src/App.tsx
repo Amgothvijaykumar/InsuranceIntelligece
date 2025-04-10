@@ -9,6 +9,7 @@ import AuthPage from "@/pages/auth-page";
 import AssessmentPage from "@/pages/assessment-page";
 import PredictionResultPage from "@/pages/prediction-result-page";
 import ManagerDashboard from "@/pages/manager-dashboard";
+import ProfilePage from "@/pages/profile-page";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -19,6 +20,7 @@ function Router() {
       <ProtectedRoute path="/assessment" component={AssessmentPage} />
       <ProtectedRoute path="/prediction" component={PredictionResultPage} />
       <ProtectedRoute path="/manager" component={ManagerDashboard} />
+      <ProtectedRoute path="/profile" component={ProfilePage} />
       <Route component={NotFound} />
     </Switch>
   );

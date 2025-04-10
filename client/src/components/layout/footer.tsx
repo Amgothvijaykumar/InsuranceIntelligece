@@ -1,78 +1,75 @@
-import { Link } from "wouter";
-import { Facebook, Twitter, Linkedin, Shield } from "lucide-react";
+import { Github, MessageCircle, Twitter } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-800">
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center">
-              <Shield className="h-8 w-8 text-white" />
-              <span className="ml-2 text-xl font-semibold text-white">InsureTech</span>
+    <footer className="bg-white border-t">
+      <div className="mx-auto w-full max-w-screen-xl p-6 py-6 lg:py-8">
+        <div className="md:flex md:justify-between">
+          <div className="mb-6 md:mb-0">
+            <div className="flex items-center space-x-3 rtl:space-x-reverse">
+              <span className="self-center text-2xl font-semibold whitespace-nowrap text-primary">
+                InsureTech
+              </span>
             </div>
-            <p className="mt-2 text-gray-400">
-              Revolutionizing insurance with AI-powered customer prominence detection and personalized government policy recommendations.
+            <p className="mt-2 text-sm text-gray-500 max-w-md">
+              Intelligent insurance solutions powered by AI. Providing personalized policy recommendations for families across India.
             </p>
-            <div className="mt-4 flex space-x-6">
-              <a href="#" className="text-gray-400 hover:text-white">
-                <span className="sr-only">Facebook</span>
-                <Facebook className="h-6 w-6" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <span className="sr-only">Twitter</span>
-                <Twitter className="h-6 w-6" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <span className="sr-only">LinkedIn</span>
-                <Linkedin className="h-6 w-6" />
-              </a>
+          </div>
+          <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+            <div>
+              <h2 className="mb-4 text-sm font-semibold text-gray-900 uppercase">Resources</h2>
+              <ul className="text-gray-500 font-medium">
+                <li className="mb-2">
+                  <a href="/docs" className="hover:underline">Documentation</a>
+                </li>
+                <li>
+                  <a href="/faq" className="hover:underline">FAQs</a>
+                </li>
+              </ul>
             </div>
-          </div>
-          <div className="col-span-1">
-            <h3 className="text-sm font-semibold text-white tracking-wider uppercase">Insurance</h3>
-            <ul className="mt-4 space-y-4">
-              <li>
-                <a href="#" className="text-base text-gray-400 hover:text-white">Health Insurance</a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-gray-400 hover:text-white">Vehicle Insurance</a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-gray-400 hover:text-white">Life Insurance</a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-gray-400 hover:text-white">Property Insurance</a>
-              </li>
-            </ul>
-          </div>
-          <div className="col-span-1">
-            <h3 className="text-sm font-semibold text-white tracking-wider uppercase">Company</h3>
-            <ul className="mt-4 space-y-4">
-              <li>
-                <a href="#" className="text-base text-gray-400 hover:text-white">About</a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-gray-400 hover:text-white">Careers</a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-gray-400 hover:text-white">Contact</a>
-              </li>
-              <li>
-                <a href="#" className="text-base text-gray-400 hover:text-white">Privacy Policy</a>
-              </li>
-            </ul>
+            <div>
+              <h2 className="mb-4 text-sm font-semibold text-gray-900 uppercase">Legal</h2>
+              <ul className="text-gray-500 font-medium">
+                <li className="mb-2">
+                  <a href="/privacy" className="hover:underline">Privacy Policy</a>
+                </li>
+                <li>
+                  <a href="/terms" className="hover:underline">Terms &amp; Conditions</a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h2 className="mb-4 text-sm font-semibold text-gray-900 uppercase">Contact</h2>
+              <ul className="text-gray-500 font-medium">
+                <li className="mb-2">
+                  <a href="mailto:support@insuretech.com" className="hover:underline">support@insuretech.com</a>
+                </li>
+                <li>
+                  <span>+91 98765 43210</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-        <div className="mt-8 border-t border-gray-700 pt-8 md:flex md:items-center md:justify-between">
-          <div className="flex space-x-6 md:order-2">
-            <a href="#" className="text-gray-400 hover:text-gray-300">Terms & Conditions</a>
-            <a href="#" className="text-gray-400 hover:text-gray-300">Privacy Policy</a>
-            <a href="#" className="text-gray-400 hover:text-gray-300">Cookie Policy</a>
+        <hr className="my-6 border-gray-200 sm:mx-auto lg:my-8" />
+        <div className="sm:flex sm:items-center sm:justify-between">
+          <span className="text-sm text-gray-500 sm:text-center">
+            © 2025 <a href="/" className="hover:underline">InsureTech</a>. All Rights Reserved.
+          </span>
+          <div className="flex mt-4 sm:justify-center sm:mt-0 space-x-5 rtl:space-x-reverse">
+            <a href="#" className="text-gray-500 hover:text-gray-900">
+              <Twitter className="h-4 w-4" />
+              <span className="sr-only">Twitter</span>
+            </a>
+            <a href="#" className="text-gray-500 hover:text-gray-900">
+              <Github className="h-4 w-4" />
+              <span className="sr-only">GitHub</span>
+            </a>
+            <a href="#" className="text-gray-500 hover:text-gray-900">
+              <MessageCircle className="h-4 w-4" />
+              <span className="sr-only">Discord</span>
+            </a>
           </div>
-          <p className="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
-            &copy; 2023 InsureTech. All rights reserved.
-          </p>
         </div>
       </div>
     </footer>
