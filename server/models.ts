@@ -2,8 +2,11 @@ import { CustomerAssessment } from "@shared/schema";
 import * as tf from "@tensorflow/tfjs-node";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-const MODEL_DIR = path.join(__dirname, "models");
+// Use a absolute paths for models folder
+const MODEL_DIR = path.join(process.cwd(), "server", "models");
 // Load the saved model artifacts
 const prominenceModel = path.join(MODEL_DIR, "prominence_model.h5");
 const scalerPath = path.join(MODEL_DIR, "scaler.save");
@@ -84,33 +87,70 @@ function preprocessInput(data: CustomerAssessment): number[] {
   ];
 }
 
+// Load ML model
+async function loadModel(): Promise<tf.LayersModel> {
+  try {
+    // Check if model file exists
+    if (fs.existsSync(prominenceModel)) {
+      return await tf.loadLayersModel(`file://${prominenceModel}`);
+    } else {
+      console.warn("Model file not found, using fallback prediction logic");
+      throw new Error("Model file not found");
+    }
+  } catch (error) {
+    console.error("Error loading model:", error);
+    throw error;
+  }
+}
+
 // Main prediction function
 export async function predictProminence(data: CustomerAssessment): Promise<{ isProminent: boolean, prominenceScore: number }> {
   try {
     // Preprocess the input data
     const input = preprocessInput(data);
     
-    // In a real implementation, we would load the model and make a prediction
-    // For this demo, we'll use some heuristics based on the input data
+    let prominenceScore: number;
+    let model: tf.LayersModel | null = null;
     
-    // Simple heuristic: high income, multiple policies, and high vintage = prominent
-    let prominenceScore = 0;
-    
-    // Income contributes up to 40 points
-    prominenceScore += incomeEncoder[data.income] * 10;
-    
-    // Policies count contributes up to 30 points
-    prominenceScore += Math.min(data.policiesCount * 5, 30);
-    
-    // Vintage (years with company) contributes up to 30 points
-    prominenceScore += Math.min(data.vintage * 3, 30);
-    
-    // Claim amount reduces score (inverse relationship)
-    const normalizedClaim = data.claimAmount / 50000; // Normalize to a scale
-    prominenceScore -= Math.min(normalizedClaim * 10, 20);
-    
-    // Cap the score at 100
-    prominenceScore = Math.max(0, Math.min(prominenceScore, 100));
+    try {
+      // Try to load and use the TensorFlow model
+      model = await loadModel();
+      // Convert input to tensor
+      const inputTensor = tf.tensor2d([input]);
+      // Get prediction
+      const prediction = model.predict(inputTensor) as tf.Tensor;
+      const result = prediction.dataSync()[0] * 100;
+      prominenceScore = Math.round(result);
+      // Clean up tensors
+      inputTensor.dispose();
+      prediction.dispose();
+    } catch (modelError) {
+      console.warn("Using fallback prediction method:", modelError.message);
+      
+      // Fallback logic when model is not available or fails
+      prominenceScore = 0;
+      
+      // Income contributes up to 40 points
+      prominenceScore += incomeEncoder[data.income] * 10;
+      
+      // Policies count contributes up to 30 points
+      prominenceScore += Math.min(data.policiesCount * 5, 30);
+      
+      // Vintage (years with company) contributes up to 30 points
+      prominenceScore += Math.min(data.vintage * 3, 30);
+      
+      // Claim amount reduces score (inverse relationship)
+      const normalizedClaim = data.claimAmount / 50000; // Normalize to a scale
+      prominenceScore -= Math.min(normalizedClaim * 10, 20);
+      
+      // Cap the score at 100
+      prominenceScore = Math.max(0, Math.min(prominenceScore, 100));
+    } finally {
+      // Clean up model if loaded
+      if (model) {
+        model.dispose();
+      }
+    }
     
     // Customer is prominent if score is >= 70
     const isProminent = prominenceScore >= 70;
