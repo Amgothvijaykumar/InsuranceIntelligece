@@ -1,0 +1,74 @@
+Build a Full-Stack Insurance Website using Deep Learning for Prominent Customer Detection with the following specifications and features.
+
+Project Overview:
+- The website serves both customers and insurance companies.
+- It identifies "prominent" customers via a deep learning model (an ANN built with Keras/TensorFlow), and then recommends the most-suitable government insurance policies.
+- Use CRISP-DM methodology to structure data preparation, modeling, and deployment.
+- Provide distinct user flows: a customer journey for policy selection and a manager dashboard for analytics and customer management.
+
+Deep Learning Component:
+- The model is trained to predict whether a customer is prominent based on inputs such as Gender, Area (urban/rural), Qualification, Income (categories like <2L, 2–5L, etc.), Vintage (years with the company), Claim Amount, No. of Policies, Policies Chosen, Policy Type, and Marital Status.
+- The trained model file is `prominence_model.h5` and supporting files include `income_encoder.save`, `policy_encoder.save`, and `scaler.save`.
+- The backend should load these files to predict a customer’s prominence status using input data from a basic form.
+
+Backend Requirements (Flask or Node.js with Express):
+1. **API Endpoints:**
+   - **Authentication:** Signup and Login endpoints for both customers and managers.
+   - **Prediction:** An endpoint that accepts a POST request containing the 10 input fields, processes the input (using the encoders and scaler) and predicts the prominence status using `prominence_model.h5`.
+   - **Policy Data:** Endpoints to fetch policy lists (from a MongoDB collection) and to support advanced search and policy comparisons.
+   - **User Management:** Endpoints to save and retrieve customer form responses and manager queries.
+
+2. **Data Flow:**
+   - Use a structured workflow following CRISP-DM, beginning with data preprocessing, model inference, and then storing or forwarding the outputs.
+   - Integrate a government scheme eligibility check by auto-validating based on policy criteria during prediction.
+
+3. **Database:**
+   - Use MongoDB (Atlas or local) with collections for Customers, Managers, Prominent Customers, and Policy Details.
+   - Implement secure, encrypted storage for sensitive fields (e.g., income, health details).
+
+Frontend Requirements (React with Vite):
+1. **General:**
+   - Create a modern, responsive UI using React (preferably with Vite for speed) and style using TailwindCSS or Bootstrap.
+   - Implement separate dashboards/views for customers and managers.
+   - Use Axios or Fetch API to communicate with the backend APIs.
+
+2. **Pages/Components:**
+   - **Landing Page:** Includes a navigation bar (Home, Login, About, Helpline) and clickable insurance policy boxes (Health Insurance, Vehicle Insurance, Life Term Insurance).
+   - **Customer Flow:**
+     - **Sign Up/Sign In**: For new customers.
+     - **Basic Form:** A form with 10 questions corresponding to the DL model inputs.
+     - **Prediction Result:** Display the predicted prominence status and relevant policy recommendations.
+     - **Policy Details Page:** Load detailed forms/questions if a user selects a policy; then save responses to MongoDB.
+   - **Manager Flow:**
+     - **Dashboard:** Display charts/statistics (e.g., customer prominence trends, policy uptake), lists of prominent customers, and options to download reports.
+     - **Customer List:** Filter viewable by policy type, with details and search functionality.
+
+3. **Additional Features:**
+   - Family Health Advisor: Suggestions for pediatric, senior, or maternity-focused policies.
+   - Automated Alerts: Frontend notifications for policy renewals, new scheme announcements, or eligibility changes.
+   - Multi-Language Support: Incorporate options for Hindi, Tamil, and other regional languages.
+   - Mobile-First PWA: Ensure offline access for low-connectivity areas.
+
+Project Structure and Setup:
+- **Folder Structure:**
+  - `/frontend/vite-app` for the React project.
+  - `/backend` for the Flask (or Node.js) project.
+  - `/models` to store `prominence_model.h5`, `income_encoder.save`, `policy_encoder.save`, and `scaler.save`.
+- **Setup Instructions:**
+  - *Backend:*
+    - Create a virtual environment, install dependencies (Flask or Express, Keras, TensorFlow, MongoDB drivers, etc.).
+    - Provide a detailed `requirements.txt` or `package.json`.
+    - Create and document API endpoints.
+  - *Frontend:*
+    - Initialize a Vite React project, install dependencies, and run using `npm run dev`.
+  - *Database:*
+    - Provide instructions to set up MongoDB and create the required collections.
+
+Additional Guidelines:
+- Ensure proper role-based access control for customers, agents, and admins.
+- Add real-time policy sync via web scraping/APIs to dynamically update government scheme details.
+- Include comprehensive comments and documentation in the code, guiding through model integration, API usage, and frontend interactions.
+- Use proper error handling and input validation in both frontend and backend components.
+
+Final Task: Generate complete project code with routing, UI components, API endpoints, database connectivity, and deep learning model integration according to the detailed specifications.
+
