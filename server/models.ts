@@ -92,7 +92,12 @@ async function loadModel(): Promise<tf.LayersModel> {
   try {
     // Check if model file exists
     if (fs.existsSync(prominenceModel)) {
-      return await tf.loadLayersModel(`file://${prominenceModel}`);
+      // For HDF5 files, we need to use tf.node.loadSavedModel instead of loadLayersModel
+      // Alternatively, we should convert the model to the TensorFlow.js format
+      
+      // Since we're using an HDF5 file which isn't directly supported in TF.js
+      // we'll throw an error to use the fallback mechanism
+      throw new Error("HDF5 format not directly supported in TensorFlow.js");
     } else {
       console.warn("Model file not found, using fallback prediction logic");
       throw new Error("Model file not found");
@@ -124,14 +129,14 @@ export async function predictProminence(data: CustomerAssessment): Promise<{ isP
       // Clean up tensors
       inputTensor.dispose();
       prediction.dispose();
-    } catch (modelError) {
-      console.warn("Using fallback prediction method:", modelError.message);
+    } catch (error: any) {
+      console.warn("Using fallback prediction method:", error.message);
       
       // Fallback logic when model is not available or fails
       prominenceScore = 0;
       
       // Income contributes up to 40 points
-      prominenceScore += incomeEncoder[data.income] * 10;
+      prominenceScore += (incomeEncoder[data.income] || 0) * 10;
       
       // Policies count contributes up to 30 points
       prominenceScore += Math.min(data.policiesCount * 5, 30);

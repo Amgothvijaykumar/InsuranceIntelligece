@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ReactNode } from "react";
+import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
 
 interface PolicyCardProps {
   title: string;
@@ -10,6 +12,17 @@ interface PolicyCardProps {
 }
 
 export default function PolicyCard({ title, description, icon, imageUrl }: PolicyCardProps) {
+  const [, navigate] = useLocation();
+  const { user } = useAuth();
+
+  const handleViewPlans = () => {
+    if (user) {
+      navigate("/assessment");
+    } else {
+      navigate("/auth");
+    }
+  };
+
   return (
     <Card className="group relative bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
       <div className="h-48 bg-gray-200 group-hover:opacity-75">
@@ -24,8 +37,8 @@ export default function PolicyCard({ title, description, icon, imageUrl }: Polic
           {description}
         </p>
         <div className="mt-6">
-          <Button>
-            Explore Plans
+          <Button onClick={handleViewPlans}>
+            View Plans
           </Button>
         </div>
       </div>

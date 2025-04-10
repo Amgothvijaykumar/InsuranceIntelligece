@@ -94,8 +94,12 @@ export default function ManagerDashboard() {
             <div className="flex justify-between h-16">
               <div className="flex">
                 <div className="flex-shrink-0 flex items-center">
-                  <Shield className="h-8 w-8 text-white" />
-                  <span className="ml-2 text-xl font-semibold text-white">InsureTech Manager</span>
+                  <Link href="/">
+                    <div className="flex items-center cursor-pointer">
+                      <Shield className="h-8 w-8 text-white" />
+                      <span className="ml-2 text-xl font-semibold text-white">InsureTech Manager</span>
+                    </div>
+                  </Link>
                 </div>
                 <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
                   <a href="#" className="border-white text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
